@@ -110,5 +110,34 @@ act.imp.median = median(act.imp.sum)
 ***
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r weekdays vs weekends}
+# Add a weekday/weekend factor column to dataset.
+days = weekdays(act.imp$date)
+weekend = c("Saturday", "Sunday")
+act.imp$week___ = factor(days %in% weekend, labels=c("weekday", "weekend"))
+str(act.imp)
+
+# Split the data into weekday and weekend groups and find 5-minute averages for each.
+split.act = split(act.imp, act.imp$week___)
+df = data.frame(sapply(split.act, function(x) sapply(split(x$steps, x$interval), mean)))
+
+# Plot the results side-by-side.
+# Plot 'weekday' data
+par(mfrow=c(2,1), mar=c(1.5,4.1,4.1,2.1))
+plot(df$weekday, type="l", xaxt="n", 
+     main="5-minute daily averages taken from October and November",
+     ylab="Average total steps")
+mtext("Weekday")
+axis(1, at=seq(0, length(act.cc.ave), by=24), labels=rep("", times=13), las=2)
+grid()
+# Plot 'weekend' data
+par(mar=c(5.1,4.1,0.5,2.1))
+plot(df$weekend, type="l", xaxt="n", 
+     ylab="Average total steps",
+     xlab="Five-minute intervals from 0000 to 2400")
+mtext("Weekend")
+axis(1, at=seq(0, length(act.cc.ave), by=24), labels=formatC(seq(0,2400,by=200), width=4, flag="0"), las=2)
+grid()
 
 ```
+
+#### The plot above shows the differences in weekday and weekend activity. Both graphs peak between 8 and 10 a.m. but also shows that the individual is relatively more active through the day on weekends.
