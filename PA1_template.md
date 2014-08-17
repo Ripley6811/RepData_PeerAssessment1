@@ -27,7 +27,7 @@ hist(act.cc.sum, breaks=10,
      xlab="Total steps per day")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+![plot of chunk totals histogram](figure/totals histogram.png) 
 
 ```r
 # Calculate the mean and median
@@ -67,6 +67,8 @@ total.na = sum(NA.rows)
 ```
 #### There are 2304 missing values in the dataset.
 
+#### The next bit of code replaces missing values (NA steps) with the 2-month averages found in the previous section.
+
 ```r
 # Copy data frame to create imputed dataset.
 act.imp = act
@@ -91,11 +93,11 @@ act.imp[NA.rows,"steps"] = rep(act.cc.ave, times=rep.times)[NA.rows]
 library(ggplot2)
 # Sum each days total steps.
 act.imp.sum = sapply(split(act.imp$steps, act.imp$date), sum)
-# Display histogram of total steps per day.
+# Bind the original and imputed sets for plotting.
 df.cc = data.frame(ave.steps=act.cc.sum, Dataset="Original Set", row.names=NULL)
 df.imp = data.frame(ave.steps=act.imp.sum, Dataset="Imputed Set", row.names=NULL)
 df = rbind(df.cc, df.imp)
-
+# Plot an interleaved histogram.
 gg = ggplot(df, aes(x=ave.steps, fill=Dataset)) + geom_histogram(binwidth=2000, position="dodge")
 gg = gg + ggtitle("Interleaved Histogram of Daily Totals\nfor October and November")
 gg = gg + xlab("Total steps taken each day")

@@ -16,7 +16,7 @@ act$date = as.Date(as.character(act$date))
 
 ***
 ## What is mean total number of steps taken per day?
-```{r} 
+```{r totals histogram} 
 # Get subset of complete cases.
 act.cc = act[complete.cases(act),]
 # Sum each days total steps.
@@ -57,6 +57,8 @@ NA.rows = is.na(act$steps)
 total.na = sum(NA.rows)
 ```
 #### There are `r total.na` missing values in the dataset.
+
+#### The next bit of code replaces missing values (NA steps) with the 2-month averages found in the previous section.
 ```{r}
 # Copy data frame to create imputed dataset.
 act.imp = act
@@ -88,11 +90,11 @@ print(head(act.imp))
 library(ggplot2)
 # Sum each days total steps.
 act.imp.sum = sapply(split(act.imp$steps, act.imp$date), sum)
-# Display histogram of total steps per day.
+# Bind the original and imputed sets for plotting.
 df.cc = data.frame(ave.steps=act.cc.sum, Dataset="Original Set", row.names=NULL)
 df.imp = data.frame(ave.steps=act.imp.sum, Dataset="Imputed Set", row.names=NULL)
 df = rbind(df.cc, df.imp)
-
+# Plot an interleaved histogram.
 gg = ggplot(df, aes(x=ave.steps, fill=Dataset)) + geom_histogram(binwidth=2000, position="dodge")
 gg = gg + ggtitle("Interleaved Histogram of Daily Totals\nfor October and November")
 gg = gg + xlab("Total steps taken each day")
