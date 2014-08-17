@@ -8,6 +8,8 @@ options(scipen=1, digits=2)
 ```{r}
 # Read csv data from local zip file.
 act = read.csv(unz("activity.zip", "activity.csv"))
+# Format the interval time to a four-digit number string.
+act$interval = formatC(act$interval, width=4, flag="0")
 # Convert strings in "date"" column to date objects.
 act$date = as.Date(as.character(act$date))
 ```
@@ -20,18 +22,30 @@ act.cc = act[complete.cases(act),]
 # Sum each days total steps.
 act.cc.sum = sapply(split(act.cc$steps, act.cc$date), sum)
 # Display histogram of total steps per day.
-xlab = "Total steps per day"
-hist(act.cc.sum, breaks=10, xlab=xlab, main=paste("Histogram of", tolower(xlab)))
+hist(act.cc.sum, breaks=10,
+     main="Histogram of total steps per day over two months",
+     xlab="Total steps per day")
 # Calculate the mean and median
 act.mean = mean(act.cc.sum)
 act.median = median(act.cc.sum)
 ```
-#### The mean and median total number of steps taken per day are `r act.mean` and `r act.median` respectively.
+#### The *mean* and *median* total number of steps taken per day are `r act.mean` and `r act.median` respectively.
 
 
 ***
 ## What is the average daily activity pattern?
-
+```{r}
+act.cc.ave = sapply(split(act.cc$steps, act.cc$interval), mean)
+plot(act.cc.ave, type = "l", xaxt="n", 
+     main="Average number of steps\nacross two months for each five-minute interval",
+     ylab="Average total steps",
+     xlab="Five-minute intervals from 0000 to 2400")
+# Place 2-hour ticks along x-axis.
+axis(1, at=seq(0, length(act.cc.ave), by=24), labels=formatC(seq(0,2400,by=200), width=4, flag="0"), las=2)
+act.cc.ave.max = which.max(act.cc.ave)
+abline(v=act.cc.ave.max, col="red", lty=2)
+text(act.cc.ave.max, act.cc.ave[act.cc.ave.max], paste(act.cc.ave[act.cc.ave.max], names(act.cc.ave.max), sep=" @ "), pos=4)
+```
 
 ***
 ## Imputing missing values
